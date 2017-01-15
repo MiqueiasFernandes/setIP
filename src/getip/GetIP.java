@@ -19,30 +19,46 @@ import java.util.logging.Logger;
  */
 public class GetIP {
 
+    static int timeOut = 3600;
+    static String siteParaPegarIP = "http://meuip.ciasc.gov.br/";
+    static String salvarEm = "/home/mfernandes/meuip.txt";
+
+    public static String mailDe = "casamentodemiqueiasealda@gmail.com";
+    public static String mailPara = "contatomiqueiasfernandes.postarnosite@blogger.com, contatomiqueiasfernandes@gmail.com";
+    public static String tipo = "text/html";
+    public static String mailPassword = "********";
+
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) throws InterruptedException {
         // TODO code application logic here
 
-        int time =0;
+        System.out.println("Digite a senha para o email " + mailDe + " e aperte ENTER:");
+
+        Scanner sc = new Scanner(System.in);
+
+        mailPassword = sc.nextLine();
+
+        int time = 0;
 
         while (true) {
-            
+
             time++;
-            
+
             if (time != 1) {
                 Thread.sleep(1000);
-            if (time > 3600)
-                time = 0;
-            System.out.println("atualizando IP em " + (3600 - time));
+                if (time > 3600) {
+                    time = 0;
+                }
+                System.out.println("atualizando IP em " + (timeOut - time));
                 continue;
             }
 
             System.out.println("baixando arquivo");
             try {
-                InputStream s = Runtime.getRuntime().exec("wget http://meuip.ciasc.gov.br/ -O /home/mfernandes/meuip.txt").getInputStream();
-                Scanner sc = new Scanner(s);
+                InputStream s = Runtime.getRuntime().exec("wget " + siteParaPegarIP + " -O " + salvarEm).getInputStream();
+                sc = new Scanner(s);
                 while (sc.hasNext()) {
                     String next = sc.next();
                     System.out.println(">" + next);
@@ -54,7 +70,7 @@ public class GetIP {
             Scanner s;
             String ip = "erro";
             try {
-                s = new Scanner(new FileReader("/home/mfernandes/meuip.txt"));
+                s = new Scanner(new FileReader(salvarEm));
                 while (s.hasNext()) {
                     String next = s.next();
                     if (next.matches(".*\\d{1,3}[.]\\d{1,3}[.]\\d{1,3}")) {
@@ -68,8 +84,8 @@ public class GetIP {
 
             System.out.println("ip: " + ip);
 
-            JavaMailApp.sendMainl("Seu IP Real atualizado é " + ip, "seu ip é " + ip);
-            
+            JavaMailApp.sendMainl("ip autalizado para " + ip, "<script>window.location.href =\"http://" + ip + ":8080\";</script>");
+
         }
     }
 
