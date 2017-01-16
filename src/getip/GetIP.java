@@ -19,7 +19,7 @@ import java.util.logging.Logger;
  */
 public class GetIP {
 
-    static int timeOut = 3600;
+    static int timeOut = 3600 * 5;
     static String siteParaPegarIP = "http://meuip.ciasc.gov.br/";
     static String salvarEm = "/home/mfernandes/meuip.txt";
 
@@ -59,7 +59,7 @@ public class GetIP {
                     System.err.println("erro: " + ex + " saindo.");
                     System.exit(-3);
                 }
-                if (time > 3600) {
+                if (time > timeOut) {
                     time = 0;
                 }
                 System.out.println("atualizando IP em " + (timeOut - time));
