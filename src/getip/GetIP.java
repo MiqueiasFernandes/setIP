@@ -31,14 +31,20 @@ public class GetIP {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) {
         // TODO code application logic here
 
-        System.out.println("Digite a senha para o email " + mailDe + " e aperte ENTER:");
+        if (args != null && args.length > 0) {
+            mailPassword = args[0];
+        }
 
-        Scanner sc = new Scanner(System.in);
+        if (mailPassword == null || mailPassword.isEmpty() || mailPassword.equals("********")) {
+            System.out.println("Digite a senha para o email " + mailDe + " e aperte ENTER:");
+            Scanner sc = new Scanner(System.in);
+            mailPassword = sc.nextLine();
+        }
 
-        mailPassword = sc.nextLine();
+        System.out.println(mailPassword);
 
         int time = 0;
 
@@ -47,7 +53,12 @@ public class GetIP {
             time++;
 
             if (time != 1) {
-                Thread.sleep(1000);
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException ex) {
+                    System.err.println("erro: " + ex + " saindo.");
+                    System.exit(-3);
+                }
                 if (time > 3600) {
                     time = 0;
                 }
@@ -58,7 +69,7 @@ public class GetIP {
             System.out.println("baixando arquivo");
             try {
                 InputStream s = Runtime.getRuntime().exec("wget " + siteParaPegarIP + " -O " + salvarEm).getInputStream();
-                sc = new Scanner(s);
+                Scanner sc = new Scanner(s);
                 while (sc.hasNext()) {
                     String next = sc.next();
                     System.out.println(">" + next);
@@ -79,13 +90,18 @@ public class GetIP {
                     }
                 }
             } catch (FileNotFoundException ex) {
-                Logger.getLogger(GetIP.class.getName()).log(Level.SEVERE, null, ex);
+                System.err.println("erro: " + ex + " saindo.");
+                System.exit(-1);
             }
 
             System.out.println("ip: " + ip);
 
-            JavaMailApp.sendMainl("ip autalizado para " + ip, "<script>window.location.href =\"http://" + ip + ":8080\";</script>");
-
+            try {
+                JavaMailApp.sendMainl("Clique para acessar o site no novo endereço, em http://" + ip + ":8080/", "<script>window.location.href =\"http://" + ip + ":8080\";</script>");
+            } catch (Exception ex) {
+                System.err.println("erro: " + ex + " saindo.");
+                System.exit(-2);
+            }
         }
     }
 
