@@ -20,7 +20,7 @@ import java.util.logging.Logger;
 public class GetIP {
 
     static int timeOut = 3600 * 5;
-    static String siteParaPegarIP = "http://meuip.ciasc.gov.br/";
+    static String siteParaPegarIP = "http://www.meuip.com.br/";
     static String salvarEm = "/home/mfernandes/meuip.txt";
 
     public static String mailDe = "casamentodemiqueiasealda@gmail.com";
@@ -36,6 +36,7 @@ public class GetIP {
 
         if (args != null && args.length > 0) {
             mailPassword = args[0];
+            timeOut = Integer.parseInt(args[1]);
         }
 
         if (mailPassword == null || mailPassword.isEmpty() || mailPassword.equals("********")) {
@@ -47,61 +48,67 @@ public class GetIP {
         System.out.println(mailPassword);
 
         int time = 0;
+        try {
+            while (true) {
 
-        while (true) {
+                time++;
 
-            time++;
-
-            if (time != 1) {
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException ex) {
-                    System.err.println("erro: " + ex + " saindo.");
-                    System.exit(-3);
-                }
-                if (time > timeOut) {
-                    time = 0;
-                }
-                System.out.println("atualizando IP em " + (timeOut - time));
-                continue;
-            }
-
-            System.out.println("baixando arquivo");
-            try {
-                InputStream s = Runtime.getRuntime().exec("wget " + siteParaPegarIP + " -O " + salvarEm).getInputStream();
-                Scanner sc = new Scanner(s);
-                while (sc.hasNext()) {
-                    String next = sc.next();
-                    System.out.println(">" + next);
-                }
-            } catch (IOException ex) {
-                Logger.getLogger(GetIP.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            System.out.println("imprimindo arquivo");
-            Scanner s;
-            String ip = "erro";
-            try {
-                s = new Scanner(new FileReader(salvarEm));
-                while (s.hasNext()) {
-                    String next = s.next();
-                    if (next.matches(".*\\d{1,3}[.]\\d{1,3}[.]\\d{1,3}")) {
-                        System.err.println(next);
-                        ip = next;
+                if (time != 1) {
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException ex) {
+                        System.err.println("erro: " + ex + " saindo.");
+                        System.exit(-3);
                     }
+                    if (time > timeOut) {
+                        time = 0;
+                    }
+                    System.out.println("atualizando IP em " + (timeOut - time));
+                    continue;
                 }
-            } catch (FileNotFoundException ex) {
-                System.err.println("erro: " + ex + " saindo.");
-                System.exit(-1);
-            }
 
-            System.out.println("ip: " + ip);
+                System.out.println("baixando arquivo");
+                try {
+                    InputStream s = Runtime.getRuntime().exec("wget " + siteParaPegarIP + " -O " + salvarEm).getInputStream();
+                    Scanner sc = new Scanner(s);
+                    while (sc.hasNext()) {
+                        String next = sc.next();
+                        System.out.println(">" + next);
+                    }
+                } catch (Exception ex) {
+                    Logger.getLogger(GetIP.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                System.out.println("imprimindo arquivo");
+                Scanner s;
+                String ip = "erro";
+                try {
+                    s = new Scanner(new FileReader(salvarEm));
+                    while (s.hasNext()) {
+                        String next = s.next();
+                        if (next.matches(".*\\d{1,3}[.]\\d{1,3}[.]\\d{1,3}")) {
+                            System.err.println(next);
+                            ip = next;
+                        }
+                    }
+                } catch (Exception ex) {
+                    System.err.println("erro: " + ex + " saindo.");
+                    System.exit(-1);
+                }
 
-            try {
-                JavaMailApp.sendMainl("Clique para acessar o site no novo endereço, em http://" + ip + ":8080/", "<script>window.location.href =\"http://" + ip + ":8080\";</script>");
-            } catch (Exception ex) {
-                System.err.println("erro: " + ex + " saindo.");
-                System.exit(-2);
+                System.out.println("ip: " + ip);
+
+                try {
+                    JavaMailApp.sendMainl("segue o ip para acesso ao ITGM Rest " + ip + ":", "segue o ip para acesso ao ITGM Rest " + ip + ":");
+                } catch (Exception ex) {
+                    System.err.println("erro: " + ex + " saindo.");
+                    System.exit(-2);
+                }
+                
+                if(timeOut == 0)
+                    System.exit(0);
             }
+        } catch (Exception ex) {
+            System.err.println("ERRO: " + ex);
         }
     }
 
