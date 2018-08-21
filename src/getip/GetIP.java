@@ -23,8 +23,8 @@ public class GetIP {
     static String siteParaPegarIP = "http://www.meuip.com.br/";
     static String salvarEm = "/home/mfernandes/meuip.txt";
 
-    public static String mailDe = "casamentodemiqueiasealda@gmail.com";
-    public static String mailPara = "contatomiqueiasfernandes.postarnosite@blogger.com, contatomiqueiasfernandes@gmail.com";
+    public static String mailDe = "";
+    public static String mailPara = "";
     public static String tipo = "text/html";
     public static String mailPassword = "********";
 
